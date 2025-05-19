@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to PDF Converter - nzr Tools</title>
+    <!-- ======= Styles ====== -->
+    <link rel="stylesheet" href="template.css">
+    <style>
+        /* Text to PDF Specific Styles */
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .pdf-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 24px auto;
+            padding: 24px;
+        }
+
+        .tips-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .tips-section h3 {
+            font-weight: 600;
+            color: var(--black1);
+            margin-bottom: 12px;
+        }
+
+        .tips-section ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            color: var(--black2);
+        }
+
+        .tips-section li {
+            margin-bottom: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--black1);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea.form-input {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .generate-btn,
+        .download-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .generate-btn {
+            background: var(--blue);
+            color: white;
+        }
+
+        .download-btn {
+            background: #059669;
+            color: white;
+            display: none;
+        }
+
+        .generate-btn:hover,
+        .download-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .generate-btn:disabled,
+        .download-btn:disabled {
+            background: var(--black2);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .preview-section {
+            margin-top: 32px;
+            display: none;
+        }
+
+        .preview-section h3 {
+            font-weight: 600;
+            color: var(--black1);
+            margin-bottom: 16px;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .preview-frame {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="logo-apple"></ion-icon>
+                        </span>
+                        <span class="title">nzr Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="index.html#tools">
+                        <span class="icon">
+                            <ion-icon name="construct-outline"></ion-icon>
+                        </span>
+                        <span class="title">Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#AI">
+                        <span class="icon">
+                            <ion-icon name="logo-reddit"></ion-icon>
+                        </span>
+                        <span class="title">AI</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#downloader">
+                        <span class="icon">
+                            <ion-icon name="download-outline"></ion-icon>
+                        </span>
+                        <span class="title">Downloader</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#stalk">
+                        <span class="icon">
+                            <ion-icon name="search-outline"></ion-icon>
+                        </span>
+                        <span class="title">Stalk</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Search here">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <div class="user">
+                    <img src="assets/imgs/customer01.jpg" alt="">
+                </div>
+            </div>
+
+            <!-- ======================= Content ================== -->
+            <div class="content-container">
+                <div class="pdf-container">
+                    <!-- Tips Section -->
+                    <div class="tips-section">
+                        <h3>Tips:</h3>
+                        <ul>
+                            <li>Enter your text and customize the PDF appearance</li>
+                            <li>Choose from various fonts and formatting options</li>
+                            <li>Add headers, footers, and watermarks as needed</li>
+                            <li>Preview and download your generated PDF</li>
+                        </ul>
+                    </div>
+
+                    <!-- Text Input -->
+                    <div class="form-group">
+                        <label for="text">Text Content</label>
+                        <textarea id="text" 
+                                 class="form-input"
+                                 placeholder="Enter your text here..."></textarea>
+                    </div>
+
+                    <!-- Font Settings -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="font">Font</label>
+                            <select id="font" class="form-input">
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="Times">Times</option>
+                                <option value="Courier">Courier</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fontSize">Font Size</label>
+                            <input type="number" 
+                                   id="fontSize" 
+                                   class="form-input"
+                                   value="12" 
+                                   min="8" 
+                                   max="72">
+                        </div>
+                    </div>
+
+                    <!-- Text Alignment -->
+                    <div class="form-group">
+                        <label for="align">Text Alignment</label>
+                        <select id="align" class="form-input">
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right">Right</option>
+                            <option value="justify">Justify</option>
+                        </select>
+                    </div>
+
+                    <!-- Document Settings -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="title">Document Title</label>
+                            <input type="text" 
+                                   id="title" 
+                                   class="form-input"
+                                   placeholder="Optional title">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="header">Header Text</label>
+                            <input type="text" 
+                                   id="header" 
+                                   class="form-input"
+                                   placeholder="Optional header">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="footer">Footer Text</label>
+                            <input type="text" 
+                                   id="footer" 
+                                   class="form-input"
+                                   placeholder="Optional footer">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="watermark">Watermark URL</label>
+                            <input type="text" 
+                                   id="watermark" 
+                                   class="form-input"
+                                   placeholder="Optional watermark image URL">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wmSize">Watermark Size</label>
+                        <input type="number" 
+                               id="wmSize" 
+                               class="form-input"
+                               value="30" 
+                               min="10" 
+                               max="100">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button id="generateBtn" class="generate-btn">
+                            <div id="loading" class="loading"></div>
+                            <ion-icon name="document-text-outline"></ion-icon>
+                            Generate PDF
+                        </button>
+                        <button id="downloadBtn" class="download-btn">
+                            <ion-icon name="download-outline"></ion-icon>
+                            Download PDF
+                        </button>
+                    </div>
+
+                    <div id="errorMessage" class="error-message">
+                        An error occurred while generating the PDF. Please try again.
+                    </div>
+
+                    <!-- PDF Preview -->
+                    <div id="previewSection" class="preview-section">
+                        <h3>PDF Preview</h3>
+                        <iframe id="pdfViewer" class="preview-frame"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="template.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        // Get DOM elements
+        const textInput = document.getElementById('text');
+        const fontSelect = document.getElementById('font');
+        const fontSizeInput = document.getElementById('fontSize');
+        const alignSelect = document.getElementById('align');
+        const titleInput = document.getElementById('title');
+        const headerInput = document.getElementById('header');
+        const footerInput = document.getElementById('footer');
+        const watermarkInput = document.getElementById('watermark');
+        const wmSizeInput = document.getElementById('wmSize');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const previewSection = document.getElementById('previewSection');
+        const pdfViewer = document.getElementById('pdfViewer');
+
+        // Generate PDF
+        generateBtn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            if (!text) {
+                errorMessage.textContent = 'Please enter some text to convert.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Hide error message and preview
+            errorMessage.classList.remove('show');
+            previewSection.style.display = 'none';
+            downloadBtn.style.display = 'none';
+
+            // Show loading
+            loading.style.display = 'block';
+            generateBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/textToPdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text,
+                        font: fontSelect.value,
+                        fontSize: parseInt(fontSizeInput.value),
+                        align: alignSelect.value,
+                        title: titleInput.value,
+                        header: headerInput.value,
+                        footer: footerInput.value,
+                        watermark: watermarkInput.value,
+                        watermarkSize: parseInt(wmSizeInput.value)
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate PDF');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                pdfViewer.src = url;
+                previewSection.style.display = 'block';
+                downloadBtn.style.display = 'flex';
+                
+                // Setup download button
+                downloadBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'document.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred while generating the PDF. Please try again.';
+                errorMessage.classList.add('show');
+            } finally {
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        });
+
+        // Input validation
+        fontSizeInput.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (value < 8) e.target.value = 8;
+            if (value > 72) e.target.value = 72;
+        });
+
+        wmSizeInput.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (value < 10) e.target.value = 10;
+            if (value > 100) e.target.value = 100;
+        });
+    </script>
+</body>
+</html> 

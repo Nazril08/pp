@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Tool - nzr Tools</title>
+    <!-- ======= Styles ====== -->
+    <link rel="stylesheet" href="template.css">
+    <style>
+        /* OCR Tool Specific Styles */
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ocr-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 24px auto;
+            padding: 24px;
+        }
+
+        .tips-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .tips-section h3 {
+            font-weight: 600;
+            color: var(--black1);
+            margin-bottom: 12px;
+        }
+
+        .tips-section ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            color: var(--black2);
+        }
+
+        .tips-section li {
+            margin-bottom: 4px;
+        }
+
+        .upload-section {
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .upload-section:hover {
+            border-color: var(--blue);
+            background: #f3f4f6;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .choose-btn {
+            background: var(--blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .choose-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: var(--black2);
+            margin: 8px 0;
+        }
+
+        .extract-btn {
+            background: var(--blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 16px auto 0;
+        }
+
+        .extract-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .extract-btn:disabled {
+            background: var(--black2);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .preview-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            margin: 0 auto;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .preview-text {
+            color: var(--black2);
+            font-size: 15px;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .result-section h3 {
+            font-weight: 600;
+            color: var(--black1);
+            margin-bottom: 16px;
+        }
+
+        .result-text {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            resize: vertical;
+            margin-bottom: 16px;
+        }
+
+        .copy-btn {
+            background: #059669;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .loading {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .upload-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="logo-apple"></ion-icon>
+                        </span>
+                        <span class="title">nzr Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="index.html#tools">
+                        <span class="icon">
+                            <ion-icon name="construct-outline"></ion-icon>
+                        </span>
+                        <span class="title">Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#AI">
+                        <span class="icon">
+                            <ion-icon name="logo-reddit"></ion-icon>
+                        </span>
+                        <span class="title">AI</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#downloader">
+                        <span class="icon">
+                            <ion-icon name="download-outline"></ion-icon>
+                        </span>
+                        <span class="title">Downloader</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#stalk">
+                        <span class="icon">
+                            <ion-icon name="search-outline"></ion-icon>
+                        </span>
+                        <span class="title">Stalk</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Search here">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <div class="user">
+                    <img src="assets/imgs/customer01.jpg" alt="">
+                </div>
+            </div>
+
+            <!-- ======================= Content ================== -->
+            <div class="content-container">
+                <div class="ocr-container">
+                    <!-- Tips Section -->
+                    <div class="tips-section">
+                        <h3>Tips for Better Results:</h3>
+                        <ul>
+                            <li>Use clear, well-lit images</li>
+                            <li>Ensure text is properly focused</li>
+                            <li>Avoid skewed or rotated text</li>
+                            <li>Supported formats: JPG, PNG (max 5MB)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Upload Section -->
+                    <div class="upload-section">
+                        <div class="file-input-wrapper">
+                            <button class="choose-btn">
+                                <ion-icon name="image-outline"></ion-icon>
+                                Choose Image
+                            </button>
+                            <input type="file" id="imageFile" accept="image/*">
+                        </div>
+                        <p id="fileName" class="file-name">No file selected</p>
+                        <button id="extractBtn" class="extract-btn">
+                            <div id="loading" class="loading"></div>
+                            <ion-icon name="text-outline"></ion-icon>
+                            Extract Text
+                        </button>
+                    </div>
+
+                    <div id="errorMessage" class="error-message">
+                        An error occurred while processing the image. Please try again.
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="preview-section">
+                        <img id="previewImage" class="preview-image" alt="Image preview">
+                        <p id="previewText" class="preview-text">Image preview will appear here</p>
+                    </div>
+
+                    <!-- Result Section -->
+                    <div id="resultSection" class="result-section">
+                        <h3>Extracted Text</h3>
+                        <textarea id="resultText" class="result-text" readonly></textarea>
+                        <button id="copyBtn" class="copy-btn">
+                            <ion-icon name="copy-outline"></ion-icon>
+                            Copy Text
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="template.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        // Get DOM elements
+        const imageFile = document.getElementById('imageFile');
+        const fileName = document.getElementById('fileName');
+        const extractBtn = document.getElementById('extractBtn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const previewImage = document.getElementById('previewImage');
+        const previewText = document.getElementById('previewText');
+        const resultSection = document.getElementById('resultSection');
+        const resultText = document.getElementById('resultText');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // Handle file selection
+        imageFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file type and size
+            if (!file.type.startsWith('image/')) {
+                errorMessage.textContent = 'Please select an image file.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                errorMessage.textContent = 'Image size should not exceed 5MB.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Hide error message
+            errorMessage.classList.remove('show');
+
+            // Update file name
+            fileName.textContent = file.name;
+
+            // Show extract button
+            extractBtn.style.display = 'flex';
+
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+                previewText.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Extract text from image
+        extractBtn.addEventListener('click', async () => {
+            const file = imageFile.files[0];
+            if (!file) return;
+
+            // Hide error message and result
+            errorMessage.classList.remove('show');
+            resultSection.style.display = 'none';
+
+            // Show loading
+            loading.style.display = 'block';
+            extractBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const response = await fetch('/api/ocr', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to extract text');
+                }
+
+                const data = await response.json();
+                resultText.value = data.text;
+                resultSection.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred while processing the image. Please try again.';
+                errorMessage.classList.add('show');
+            } finally {
+                loading.style.display = 'none';
+                extractBtn.disabled = false;
+            }
+        });
+
+        // Copy extracted text
+        copyBtn.addEventListener('click', () => {
+            resultText.select();
+            document.execCommand('copy');
+            
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<ion-icon name="checkmark-outline"></ion-icon>Copied!';
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        });
+    </script>
+</body>
+</html> 

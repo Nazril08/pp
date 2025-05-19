@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translator - nzr Tools</title>
+    <!-- ======= Styles ====== -->
+    <link rel="stylesheet" href="template.css">
+    <style>
+        /* Translator Specific Styles */
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .translator-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 24px auto;
+            padding: 24px;
+        }
+
+        .translator-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .text-area-container {
+            position: relative;
+        }
+
+        .text-area-container label {
+            display: block;
+            font-weight: 500;
+            color: var(--black1);
+            margin-bottom: 8px;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .text-area:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .language-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 16px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .language-select:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .swap-btn {
+            background: var(--blue);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            margin: 80px auto 0;
+        }
+
+        .swap-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.1);
+        }
+
+        .character-count {
+            font-size: 14px;
+            color: var(--black2);
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .translate-btn,
+        .copy-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .translate-btn {
+            background: var(--blue);
+            color: white;
+        }
+
+        .copy-btn {
+            background: #059669;
+            color: white;
+        }
+
+        .translate-btn:hover,
+        .copy-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .translate-btn:disabled,
+        .copy-btn:disabled {
+            background: var(--black2);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .translator-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .swap-btn {
+                margin: 0 auto;
+                transform: rotate(90deg);
+            }
+
+            .swap-btn:hover {
+                transform: rotate(90deg) scale(1.1);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="logo-apple"></ion-icon>
+                        </span>
+                        <span class="title">nzr Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="index.html#tools">
+                        <span class="icon">
+                            <ion-icon name="construct-outline"></ion-icon>
+                        </span>
+                        <span class="title">Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#AI">
+                        <span class="icon">
+                            <ion-icon name="logo-reddit"></ion-icon>
+                        </span>
+                        <span class="title">AI</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#downloader">
+                        <span class="icon">
+                            <ion-icon name="download-outline"></ion-icon>
+                        </span>
+                        <span class="title">Downloader</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#stalk">
+                        <span class="icon">
+                            <ion-icon name="search-outline"></ion-icon>
+                        </span>
+                        <span class="title">Stalk</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Search here">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <div class="user">
+                    <img src="assets/imgs/customer01.jpg" alt="">
+                </div>
+            </div>
+
+            <!-- ======================= Content ================== -->
+            <div class="content-container">
+                <div class="translator-container">
+                    <div class="translator-grid">
+                        <!-- Source Text -->
+                        <div class="text-area-container">
+                            <label for="sourceText">Source Text</label>
+                            <select id="sourceLang" class="language-select">
+                                <option value="auto">Detect Language</option>
+                                <option value="en">English</option>
+                                <option value="id">Indonesian</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ko">Korean</option>
+                                <option value="zh">Chinese</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="it">Italian</option>
+                                <option value="ru">Russian</option>
+                            </select>
+                            <textarea id="sourceText" 
+                                     class="text-area"
+                                     placeholder="Enter text to translate..."></textarea>
+                            <div id="sourceCount" class="character-count">0 characters</div>
+                        </div>
+
+                        <!-- Swap Button -->
+                        <button id="swapBtn" class="swap-btn">
+                            <ion-icon name="swap-horizontal-outline"></ion-icon>
+                        </button>
+
+                        <!-- Target Text -->
+                        <div class="text-area-container">
+                            <label for="targetText">Translation</label>
+                            <select id="targetLang" class="language-select">
+                                <option value="en">English</option>
+                                <option value="id" selected>Indonesian</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ko">Korean</option>
+                                <option value="zh">Chinese</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="it">Italian</option>
+                                <option value="ru">Russian</option>
+                            </select>
+                            <textarea id="targetText" 
+                                     class="text-area"
+                                     placeholder="Translation will appear here..."
+                                     readonly></textarea>
+                            <div id="targetCount" class="character-count">0 characters</div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="translateBtn" class="translate-btn">
+                            <div id="loading" class="loading"></div>
+                            <ion-icon name="language-outline"></ion-icon>
+                            Translate
+                        </button>
+                        <button id="copyBtn" class="copy-btn">
+                            <ion-icon name="copy-outline"></ion-icon>
+                            Copy Translation
+                        </button>
+                    </div>
+
+                    <div id="errorMessage" class="error-message">
+                        An error occurred during translation. Please try again.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="template.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        // Get DOM elements
+        const sourceText = document.getElementById('sourceText');
+        const targetText = document.getElementById('targetText');
+        const sourceLang = document.getElementById('sourceLang');
+        const targetLang = document.getElementById('targetLang');
+        const swapBtn = document.getElementById('swapBtn');
+        const translateBtn = document.getElementById('translateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const sourceCount = document.getElementById('sourceCount');
+        const targetCount = document.getElementById('targetCount');
+
+        // Update character count
+        function updateCharCount(text, display) {
+            const count = text.length;
+            display.textContent = `${count} characters`;
+        }
+
+        sourceText.addEventListener('input', () => {
+            updateCharCount(sourceText.value, sourceCount);
+        });
+
+        // Swap languages
+        swapBtn.addEventListener('click', () => {
+            if (sourceLang.value === 'auto') return;
+            
+            const tempLang = sourceLang.value;
+            sourceLang.value = targetLang.value;
+            targetLang.value = tempLang;
+
+            const tempText = sourceText.value;
+            sourceText.value = targetText.value;
+            targetText.value = tempText;
+
+            updateCharCount(sourceText.value, sourceCount);
+            updateCharCount(targetText.value, targetCount);
+        });
+
+        // Translate text
+        translateBtn.addEventListener('click', async () => {
+            const text = sourceText.value.trim();
+            if (!text) {
+                errorMessage.textContent = 'Please enter some text to translate.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Hide error message
+            errorMessage.classList.remove('show');
+
+            // Show loading
+            loading.style.display = 'block';
+            translateBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text,
+                        sourceLang: sourceLang.value,
+                        targetLang: targetLang.value
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Translation failed');
+                }
+
+                const data = await response.json();
+                targetText.value = data.translation;
+                updateCharCount(targetText.value, targetCount);
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred during translation. Please try again.';
+                errorMessage.classList.add('show');
+            } finally {
+                loading.style.display = 'none';
+                translateBtn.disabled = false;
+            }
+        });
+
+        // Copy translation
+        copyBtn.addEventListener('click', () => {
+            targetText.select();
+            document.execCommand('copy');
+            
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<ion-icon name="checkmark-outline"></ion-icon>Copied!';
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        });
+    </script>
+</body>
+</html> 

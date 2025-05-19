@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Text to Speech - nzr Tools</title>
+    <!-- ======= Styles ====== -->
+    <link rel="stylesheet" href="template.css">
+    <style>
+        /* TTS Specific Styles */
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tts-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 24px auto;
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--black1);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-input:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .select-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .select-input:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .range-group {
+            margin-bottom: 24px;
+        }
+
+        .range-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--black1);
+            margin-bottom: 8px;
+        }
+
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #e5e7eb;
+            outline: none;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--blue);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            background: #1d4ed8;
+        }
+        
+        .range-value {
+            text-align: center;
+            font-size: 14px;
+            color: var(--black2);
+            margin-top: 8px;
+        }
+
+        .generate-btn {
+            background: var(--blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .generate-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .generate-btn:disabled {
+            background: var(--black2);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid var(--blue);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 24px;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .audio-player.show {
+            display: block;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            height: 40px;
+        }
+
+        .download-btn {
+            background: #059669;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .download-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .form-group,
+            .range-group {
+                margin-bottom: 16px;
+            }
+
+            .form-input,
+            .select-input {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="logo-apple"></ion-icon>
+                        </span>
+                        <span class="title">nzr Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="index.html#tools">
+                        <span class="icon">
+                            <ion-icon name="construct-outline"></ion-icon>
+                        </span>
+                        <span class="title">Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#AI">
+                        <span class="icon">
+                            <ion-icon name="logo-reddit"></ion-icon>
+                        </span>
+                        <span class="title">AI</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#downloader">
+                        <span class="icon">
+                            <ion-icon name="download-outline"></ion-icon>
+                        </span>
+                        <span class="title">Downloader</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#stalk">
+                        <span class="icon">
+                            <ion-icon name="search-outline"></ion-icon>
+                        </span>
+                        <span class="title">Stalk</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Search here">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <div class="user">
+                    <img src="assets/imgs/customer01.jpg" alt="">
+                </div>
+            </div>
+
+            <!-- ======================= Content ================== -->
+            <div class="content-container">
+                <div class="tts-container">
+                    <!-- Text Input -->
+                    <div class="form-group">
+                        <label for="textInput">Text to Convert</label>
+                        <textarea id="textInput" 
+                                 class="form-input"
+                                 placeholder="Enter text to convert to speech..."
+                                 rows="4"></textarea>
+                    </div>
+
+                    <!-- Voice Selection -->
+                    <div class="form-group">
+                        <label for="voiceSelect">Select Voice</label>
+                        <select id="voiceSelect" class="select-input">
+                            <option value="misaki">Misaki (Japanese)</option>
+                            <option value="airi">Airi (Japanese)</option>
+                            <option value="sora">Sora (Japanese)</option>
+                            <option value="takumi">Takumi (Japanese)</option>
+                            <option value="daichi">Daichi (Japanese)</option>
+                        </select>
+                    </div>
+
+                    <!-- Speed Control -->
+                    <div class="range-group">
+                        <label for="speedRange">Speech Speed</label>
+                        <input type="range" 
+                               id="speedRange" 
+                               class="range-slider"
+                               min="0.5" 
+                               max="2.0" 
+                               step="0.1" 
+                               value="1.0">
+                        <div id="speedValue" class="range-value">1.0x</div>
+                    </div>
+
+                    <!-- Pitch Control -->
+                    <div class="range-group">
+                        <label for="pitchRange">Voice Pitch</label>
+                        <input type="range" 
+                               id="pitchRange" 
+                               class="range-slider"
+                               min="0.5" 
+                               max="2.0" 
+                               step="0.1" 
+                               value="1.0">
+                        <div id="pitchValue" class="range-value">1.0x</div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generateBtn" class="generate-btn">
+                        <ion-icon name="mic-outline"></ion-icon>
+                        Generate Speech
+                    </button>
+
+                    <!-- Loading Indicator -->
+                    <div id="loading" class="loading"></div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="error-message">
+                        An error occurred while generating the speech. Please try again.
+                    </div>
+
+                    <!-- Audio Player -->
+                    <div id="audioPlayer" class="audio-player">
+                        <audio id="audioElement" controls>
+                            Your browser does not support the audio element.
+                        </audio>
+                        <button id="downloadBtn" class="download-btn">
+                            <ion-icon name="download-outline"></ion-icon>
+                            Download Audio
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="template.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        // Get DOM elements
+        const textInput = document.getElementById('textInput');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const speedRange = document.getElementById('speedRange');
+        const speedValue = document.getElementById('speedValue');
+        const pitchRange = document.getElementById('pitchRange');
+        const pitchValue = document.getElementById('pitchValue');
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioElement = document.getElementById('audioElement');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Update range values
+        speedRange.addEventListener('input', (e) => {
+            speedValue.textContent = `${e.target.value}x`;
+        });
+
+        pitchRange.addEventListener('input', (e) => {
+            pitchValue.textContent = `${e.target.value}x`;
+        });
+
+        // Generate speech
+        generateBtn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            if (!text) {
+                errorMessage.textContent = 'Please enter some text to convert.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Hide error and audio player
+            errorMessage.classList.remove('show');
+            audioPlayer.classList.remove('show');
+
+            // Show loading
+            loading.style.display = 'block';
+            generateBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text,
+                        voice: voiceSelect.value,
+                        speed: speedRange.value,
+                        pitch: pitchRange.value
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate speech');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                audioElement.src = url;
+                audioPlayer.classList.add('show');
+                
+                // Setup download button
+                downloadBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'tts_output.mp3';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred while generating the speech. Please try again.';
+                errorMessage.classList.add('show');
+            } finally {
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html> 

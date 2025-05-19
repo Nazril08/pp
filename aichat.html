@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant - nzr Tools</title>
+    <!-- ======= Styles ====== -->
+    <link rel="stylesheet" href="template.css">
+    <style>
+        /* Chat Container Styles */
+        .chat-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 24px auto;
+            max-width: 800px;
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header .ai-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .chat-header .ai-info h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--black1);
+            margin: 0;
+        }
+
+        .chat-header .ai-info p {
+            font-size: 14px;
+            color: var(--black2);
+            margin: 0;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .message.user {
+            background: var(--blue);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            background: #f3f4f6;
+            color: var(--black1);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Chat Input */
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            resize: none;
+            height: 48px;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input textarea:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .chat-input button {
+            padding: 0 20px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: #1e40af;
+            transform: translateY(-1px);
+        }
+
+        .chat-input button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Model Selection */
+        .model-select {
+            padding: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .model-select label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--black1);
+        }
+
+        .model-select select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--black1);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .model-select select:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Loading Animation */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            width: fit-content;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--black2);
+            border-radius: 50%;
+            animation: typing 1s infinite;
+            opacity: 0.4;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* Markdown Styling */
+        .message.ai pre {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        .message.ai code {
+            font-family: monospace;
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .message.ai a {
+            color: var(--blue);
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-container {
+                margin: 12px;
+                height: calc(100vh - 140px);
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .model-select {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="logo-apple"></ion-icon>
+                        </span>
+                        <span class="title">nzr Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#tools">
+                        <span class="icon">
+                            <ion-icon name="construct-outline"></ion-icon>
+                        </span>
+                        <span class="title">Tools</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="index.html#AI">
+                        <span class="icon">
+                            <ion-icon name="logo-reddit"></ion-icon>
+                        </span>
+                        <span class="title">AI</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#downloader">
+                        <span class="icon">
+                            <ion-icon name="download-outline"></ion-icon>
+                        </span>
+                        <span class="title">Downloader</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#stalk">
+                        <span class="icon">
+                            <ion-icon name="search-outline"></ion-icon>
+                        </span>
+                        <span class="title">Stalk</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Search here">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <div class="user">
+                    <img src="assets/imgs/customer01.jpg" alt="">
+                </div>
+            </div>
+
+            <!-- ======================= Content ================== -->
+            <div class="content-container">
+                <!-- Model Selection -->
+                <div class="model-select">
+                    <label for="model">Select AI Model</label>
+                    <select id="model">
+                        <option value="gpt-4">GPT-4 (Most Capable)</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Faster)</option>
+                        <option value="claude-2">Claude 2 (Analytical)</option>
+                        <option value="gemini-pro">Gemini Pro (Google AI)</option>
+                    </select>
+                </div>
+
+                <!-- Chat Interface -->
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="ai-avatar">
+                            <ion-icon name="logo-reddit"></ion-icon>
+                        </div>
+                        <div class="ai-info">
+                            <h2>AI Assistant</h2>
+                            <p>Powered by Advanced Language Models</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            Hello! I'm your AI assistant. How can I help you today?
+                        </div>
+                    </div>
+
+                    <div class="chat-input">
+                        <textarea 
+                            id="userInput" 
+                            placeholder="Type your message here..."
+                            rows="1"
+                            onkeydown="if(event.keyCode == 13 && !event.shiftKey) { event.preventDefault(); sendMessage(); }">
+                        </textarea>
+                        <button onclick="sendMessage()" id="sendButton">
+                            <ion-icon name="send"></ion-icon>
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="template.js"></script>
+    <script src="aichat.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator - nzr Tools</title>
+    <!-- ======= Styles ====== -->
+    <link rel="stylesheet" href="template.css">
+    <style>
+        /* Image Generator Specific Styles */
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .image-generator {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 24px auto;
+            padding: 24px;
+        }
+
+        .model-select {
+            margin-bottom: 24px;
+        }
+
+        .model-select label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--black1);
+        }
+
+        .model-select select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--black1);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-input {
+            margin-bottom: 24px;
+        }
+
+        .prompt-input label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--black1);
+        }
+
+        .prompt-input textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .setting-item {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .setting-item label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--black1);
+        }
+
+        .setting-item input[type="range"] {
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .preview-area {
+            background: #f9fafb;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .preview-area img {
+            max-width: 100%;
+            max-height: 512px;
+            object-fit: contain;
+        }
+
+        .generate-btn {
+            background: var(--blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+        }
+
+        .generate-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .generate-btn:disabled {
+            background: var(--black2);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="logo-apple"></ion-icon>
+                        </span>
+                        <span class="title">nzr Tools</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#tools">
+                        <span class="icon">
+                            <ion-icon name="construct-outline"></ion-icon>
+                        </span>
+                        <span class="title">Tools</span>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="index.html#AI">
+                        <span class="icon">
+                            <ion-icon name="logo-reddit"></ion-icon>
+                        </span>
+                        <span class="title">AI</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#downloader">
+                        <span class="icon">
+                            <ion-icon name="download-outline"></ion-icon>
+                        </span>
+                        <span class="title">Downloader</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="index.html#stalk">
+                        <span class="icon">
+                            <ion-icon name="search-outline"></ion-icon>
+                        </span>
+                        <span class="title">Stalk</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="Search here">
+                        <ion-icon name="search-outline"></ion-icon>
+                    </label>
+                </div>
+
+                <div class="user">
+                    <img src="assets/imgs/customer01.jpg" alt="">
+                </div>
+            </div>
+
+            <!-- ======================= Content ================== -->
+            <div class="content-container">
+                <div class="image-generator">
+                    <div class="model-select">
+                        <label for="model">Select AI Model</label>
+                        <select id="model">
+                            <option value="stable-diffusion">Stable Diffusion</option>
+                            <option value="dall-e">DALL-E</option>
+                            <option value="midjourney">Midjourney Style</option>
+                        </select>
+                    </div>
+
+                    <div class="prompt-input">
+                        <label for="prompt">Image Description</label>
+                        <textarea id="prompt" placeholder="Describe the image you want to generate..."></textarea>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>Image Size</label>
+                            <select class="form-select">
+                                <option value="512x512">512 x 512</option>
+                                <option value="768x768">768 x 768</option>
+                                <option value="1024x1024">1024 x 1024</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label>Number of Images</label>
+                            <select class="form-select">
+                                <option value="1">1 Image</option>
+                                <option value="2">2 Images</option>
+                                <option value="4">4 Images</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label>Style Strength</label>
+                            <input type="range" min="1" max="100" value="75">
+                            <div class="range-value">75%</div>
+                        </div>
+                    </div>
+
+                    <div class="preview-area" id="previewArea">
+                        <div class="placeholder-text">Generated images will appear here</div>
+                    </div>
+
+                    <button class="generate-btn" id="generateBtn">
+                        Generate Image
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="template.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html> 
